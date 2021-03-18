@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Document</title>
+    <style>
+      .container {
+        width: 80%;
+        border: black 1px solid;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div>알림 : <span id="notify"> 1</span></div>
+    <div class="container">
+      <div id="items"></div>
+
+      <form>
+        <div>
+          <input text="text" id="username" placeholder="이름을 입력하세요">
+            <input text="text" id="chat" placeholder="채팅을 입력하세요">
+            <button type="button" id="btn-chat">전송</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+
+  <!-- <script>
+    fetch("http://localhost:8080/")
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+
+        let items_el = document.querySelector("#items");
+
+        for (i of res) {
+          let item_el = document.createElement("div");
+          item_el.innerHTML = `게시글 ${i}`;
+          items_el.appendChild(item_el);
+        }
+
+        const eventSource = new EventSource("http://localhost:8080/sse");
+        eventSource.onmessage = (event) => {
+          //const data = JSON.parse(event.data);
+          console.log(event.data);
+          let notify_el = document.querySelector("#notify");
+          console.log(notify_el.textContent);
+
+          let num = Number(notify_el.textContent);
+          num = num + 1;
+          notify_el.innerHTML = num;
+        };
+        eventSource.onerror = (error) => {
+          eventSource.close();
+        };
+      });
+  </script> -->
+
+  <script>
+    let chat = $("#chat").val();
+    console.log(chat);
+
+    $("#btn-chat").on("click", (e) => {
+      e.preventDefault();
+
+      let data = {
+        chat: $("#chat").val(),
+        username: $("#username").val(),
+      };
+
+      $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/send",
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+      });
+    });
+  </script>
+
+  <script>
+    let items_el = document.querySelector("#items");
+
+    const eventSource = new EventSource(`http://localhost:8080/sse`);
+    eventSource.onmessage = (event) => {
+      let item_el = document.createElement("div");
+      item_el.innerHTML = ` ${event.data}`;
+      items_el.appendChild(item_el);
+    };
+    eventSource.onerror = (error) => {
+      eventSource.close();
+    };
+  </script>
+</html>
